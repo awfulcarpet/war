@@ -17,6 +17,11 @@ OUTDIR = .build
 OBJ = \
       $(OUTDIR)/main.o \
       $(OUTDIR)/card.o \
+      $(OUTDIR)/deck.o \
+
+TESTDIR = tests
+TESTS = \
+		$(OUTDIR)/test_deck \
 
 all: $(NAME)
 
@@ -25,6 +30,13 @@ checkleak:
 
 run: $(NAME)
 	$(OUTDIR)/$(NAME)
+
+tests: clean $(TESTS)
+	@clear
+	@$(OUTDIR)/test_*
+
+$(TESTS): $(OBJ)
+	$(CC) -o $@ $(OUTDIR)/deck.o $(TESTDIR)/test_deck.c $(CFLAGS)
 
 $(OUTDIR)/%.o: src/%.c
 	@mkdir -p $(OUTDIR)
@@ -39,6 +51,7 @@ release: $(NAME)
 	strip $(OUTDIR)/$(NAME)
 
 web-release: $(NAME)
+	@rm -rf pub index.html
 	@mkdir -p pub
 	mv -f .build/war.* pub/
 	sed 's/war.js/pub\/war.js/g' pub/war.html > index.html
@@ -50,4 +63,4 @@ uninstall:
 	rm $(PREFIX)/$(NAME)
 
 clean:
-	rm -rf .build/ log core pub/ index.html
+	rm -rf .build/ log core
