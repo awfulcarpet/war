@@ -39,8 +39,9 @@ release: $(NAME)
 	strip $(OUTDIR)/$(NAME)
 
 web-release: $(NAME)
+	@mkdir -p pub
 	mv -f .build/war.* pub/
-	mv pub/war.html pub/index.html
+	sed 's/war.js/pub\/war.js/g' pub/war.html > index.html
 
 install: $(release)
 	cp .build/$(NAME) $(PREFIX)/$(NAME)
@@ -49,4 +50,4 @@ uninstall:
 	rm $(PREFIX)/$(NAME)
 
 clean:
-	rm -rf .build/ log core
+	rm -rf .build/ log core pub/ index.html
