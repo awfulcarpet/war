@@ -5,7 +5,6 @@ EMCCFLAGS = lib/libraylib.a -s USE_GLFW=3 --shell-file minshell.html
 PLATFORM ?= PLATFORM_DESKTOP
 
 ifeq ($(PLATFORM),PLATFORM_WEB)
-	# source ~/opt/emsdk/emsdk_env.sh
 	CC=emcc
 	LDLIBS = $(EMCCFLAGS)
 	EXT = .html
@@ -21,17 +20,11 @@ OBJ = \
 
 all: $(NAME)
 
-debug:
-	tmux new-window "gdbserver :12345 $(OUTDIR)/$(NAME)"
-	tmux selectw -t 1
-	~/opt/gf/gf2 -x debug.gdb -c core
-
 checkleak:
 	valgrind --leak-check=full --show-leak-kinds=all --log-file=log $(OUTDIR)/$(NAME)
 
 run: $(NAME)
 	$(OUTDIR)/$(NAME)
-
 
 $(OUTDIR)/%.o: src/%.c
 	@mkdir -p $(OUTDIR)
@@ -44,6 +37,10 @@ $(NAME): $(OBJ)
 
 release: $(NAME)
 	strip $(OUTDIR)/$(NAME)
+
+web-release: $(NAME)
+	mv -f .build/war.* pub/
+	mv pub/war.html pub/index.html
 
 install: $(release)
 	cp .build/$(NAME) $(PREFIX)/$(NAME)
