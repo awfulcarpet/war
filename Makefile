@@ -1,7 +1,7 @@
 WARNING = -Wall -Wextra -Wpedantic -Wno-unused-result -Wno-all
 CFLAGS = -std=c99 -O2 $(WARNING) -pipe -ggdb -Iinclude
 LDLIBS = -lraylib -lGL -lm -lX11 -lpthread -ldl -lrt
-EMCCFLAGS = lib/libraylib.a -s USE_GLFW=3 --shell-file minshell.html
+EMCCFLAGS = lib/libraylib.a -s USE_GLFW=3 --shell-file minshell.html -s ASYNCIFY
 PLATFORM ?= PLATFORM_DESKTOP
 
 ifeq ($(PLATFORM),PLATFORM_WEB)
@@ -50,7 +50,7 @@ $(NAME): $(OBJ)
 release: $(NAME)
 	strip $(OUTDIR)/$(NAME)
 
-web-release: $(NAME)
+web-release: clean $(NAME)
 	@rm -rf pub index.html
 	@mkdir -p pub
 	mv -f .build/war.* pub/

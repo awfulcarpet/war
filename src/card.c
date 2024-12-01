@@ -115,7 +115,7 @@ draw_card(struct Card *card, int x, int y, float scale) {
 
 	const char *text = card_logo[card->num - 1];
 
-	float fontsize = 4 * scale * 1.5;
+	float fontsize = card_outline.width / 4;
 	Vector2 text_dim = MeasureTextEx(GetFontDefault(), text, fontsize, 1);
-	DrawText(text, card_center.x - text_dim.x / 2, card_center.y - text_dim.y / 2, fontsize, text_color);
+	DrawText(text, card_center.x - text_dim.x / 2, card_center.y - text_dim.y / 1.5, fontsize, text_color);
 }

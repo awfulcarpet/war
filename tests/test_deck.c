@@ -7,6 +7,7 @@
 
 void
 pushing(void) {
+	printf("starting pushing tests: ");
 	struct Deck *deck = push(NULL, 1, HEART);
 	assert(get_length(deck) == 1);
 
@@ -26,13 +27,14 @@ pushing(void) {
 
 void
 transfering(void) {
+	printf("starting transfering tests: ");
 	struct Deck *deck = push(NULL, 1, HEART);
 	deck = push(deck, 5, CLUB);
 	struct Deck *player = NULL;
 	struct Deck *cpu = NULL;
 
-	transfer(&deck, &player);
-	transfer(&deck, &cpu);
+	deck = transfer(deck, &player);
+	deck = transfer(deck, &cpu);
 
 	assert(player->card.suit == CLUB);
 	assert(cpu->card.suit == HEART);
