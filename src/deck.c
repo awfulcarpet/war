@@ -3,13 +3,13 @@
 #include <stdio.h>
 #include "deck.h"
 
-struct Deck * push(struct Deck *head, int num, enum SUIT suit) {
+struct Deck *
+push(struct Deck *head, int num, enum SUIT suit) {
 	struct Deck *new = calloc(1, sizeof(struct Deck));
 
-	struct Card card = {
-		suit,
-		num,
-	};
+	struct Card card = {0};
+	card.suit = suit;
+	card.num = num;
 
 	if (head == NULL) {
 		head = new;
@@ -120,4 +120,39 @@ get_length(struct Deck *deck) {
 		deck = deck->next;
 	}
 	return length;
+}
+
+void
+draw_deck(struct Deck *deck) {
+	if (deck == NULL)
+		return;
+
+	do {
+		draw_card(&deck->card);
+		deck = deck->next;
+	} while (deck != NULL);
+}
+
+void
+animate_deck(struct Deck *deck) {
+	if (deck == NULL)
+		return;
+
+	do {
+		animate_card(&deck->card);
+		deck = deck->next;
+	} while (deck != NULL);
+}
+
+void
+move_deck(struct Deck *deck, Vector2 new) {
+	float i = 0;
+	if (deck == NULL)
+		return;
+
+	do {
+		set_move(&deck->card, new, 0.4 + i);
+		deck = deck->next;
+		i += 0.06;
+	} while (deck != NULL);
 }

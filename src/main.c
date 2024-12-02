@@ -10,10 +10,11 @@ enum {
 	HEIGHT = 450,
 };
 
+
 int
 main(void) {
 	InitWindow(WIDTH, HEIGHT, "war card game");
-	SetTargetFPS(60);
+	SetTargetFPS(30);
 
 	struct Deck *deck = NULL;
 	struct Deck *player = NULL;
@@ -27,9 +28,29 @@ main(void) {
 	deck = deal(deck, &player, &cpu);
 	assert(get_length(player) == get_length(cpu));
 
+	player->card.pos = (Vector2) { 0, 0 };
+
+	Vector2 player_deck = {
+		WIDTH - 80,
+		HEIGHT - 110,
+	};
+
+	Vector2 cpu_deck = {
+		WIDTH - 80,
+		0,
+	};
+
+	move_deck(cpu, cpu_deck);
+	move_deck(player, player_deck);
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 			ClearBackground(GREEN);
+
+			animate_deck(cpu);
+			animate_deck(player);
+
+			draw_deck(cpu);
+			draw_deck(player);
 		EndDrawing();
 	}
 	CloseWindow();
