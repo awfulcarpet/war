@@ -81,11 +81,14 @@ main(void) {
 						cpu = send_to_bottom(cpu);
 						cpu = send_to_bottom(cpu);
 					}
+
 					if (cpu->card.num < player->card.num) {
 						cpu = transfer(cpu, &player);
 						player = send_to_bottom(player);
 						player = send_to_bottom(player);
 					}
+
+					// tie
 
 					state = 0;
 				break;
@@ -104,6 +107,8 @@ main(void) {
 
 		draw_deck(cpu);
 		draw_deck(player);
+		DrawText(TextFormat("%d\n", get_length(player)), player_deck.x + 10, player_deck.y + 10, 30, WHITE);
+		DrawText(TextFormat("%d\n", get_length(cpu)), cpu_deck.x + 10, cpu_deck.y + 10, 30, WHITE);
 		EndDrawing();
 	}
 	CloseWindow();
