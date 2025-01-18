@@ -14,5 +14,5 @@ struct Deck * shuffle(struct Deck *deck);
 int get_length(struct Deck *deck);
 void print_deck(struct Deck *deck);
 void draw_deck(struct Deck *deck);
-void animate_deck(struct Deck *deck);
+void update_deck(struct Deck *deck);
 void move_deck(struct Deck *deck, Vector2 new);

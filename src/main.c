@@ -46,8 +46,9 @@ main(void) {
 		BeginDrawing();
 			ClearBackground(GREEN);
 
-			animate_deck(cpu);
-			animate_deck(player);
+
+			update_deck(cpu);
+			update_deck(player);
 
 			draw_deck(cpu);
 			draw_deck(player);

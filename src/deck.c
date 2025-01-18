@@ -134,7 +134,7 @@ draw_deck(struct Deck *deck) {
 }
 
 void
-animate_deck(struct Deck *deck) {
+update_deck(struct Deck *deck) {
 	if (deck == NULL)
 		return;
 
