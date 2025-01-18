@@ -10,6 +10,7 @@ push(struct Deck *head, int num, enum SUIT suit) {
 	struct Card card = {0};
 	card.suit = suit;
 	card.num = num;
+	card.isfaceup = false;
 
 	if (head == NULL) {
 		head = new;
@@ -30,10 +31,9 @@ push(struct Deck *head, int num, enum SUIT suit) {
 struct Deck *
 transfer(struct Deck *src, struct Deck **dst) {
 	struct Deck *tmp = src->next;
-	src->next = (*dst);
+	src->next = *dst;
 	*dst = src;
-	src = tmp;
-	return src;
+	return tmp;
 }
 
 void
@@ -53,6 +53,24 @@ print_deck(struct Deck *deck) {
 		printf("%d %s\n", deck->card.num, suits[deck->card.suit]);
 		deck = deck->next;
 	} while (deck != NULL);
+}
+
+struct Deck *
+send_to_bottom(struct Deck *deck)
+{
+	struct Deck *card = deck;
+	struct Deck *next = card->next;
+	if (deck == NULL)
+		return 0;
+
+	while (deck->next != NULL) {
+		deck = deck->next;
+	}
+
+	deck->next = card;
+	card->next = NULL;
+
+	return next;
 }
 
 struct Deck *
@@ -76,7 +94,7 @@ deal(struct Deck *deck, struct Deck **player1, struct Deck **player2) {
 	return deck;
 }
 
-static struct Deck *
+struct Deck *
 get_nth(struct Deck *deck, int n) {
 	if (n == 0)
 		return NULL;
@@ -139,20 +157,17 @@ update_deck(struct Deck *deck) {
 		return;
 
 	do {
-		animate_card(&deck->card);
 		deck = deck->next;
 	} while (deck != NULL);
 }
 
 void
 move_deck(struct Deck *deck, Vector2 new) {
-	float i = 0;
 	if (deck == NULL)
 		return;
 
 	do {
-		set_move(&deck->card, new, 0.4 + i);
+		deck->card.pos = new;
 		deck = deck->next;
-		i += 0.06;
 	} while (deck != NULL);
 }
