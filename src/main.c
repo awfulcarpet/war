@@ -27,6 +27,7 @@ main(void) {
 
 	deck = deal(deck, &player, &cpu);
 	assert(get_length(player) == get_length(cpu));
+	assert(get_length(player) == 26);
 
 	player->card.pos = (Vector2) { 0, 0 };
 
@@ -60,7 +61,6 @@ main(void) {
 		ClearBackground(GREEN);
 
 		if (update) {
-			printf("%d\n", state);
 			switch (state++) {
 				case 0:
 				cpu->card.pos = cpu_play;
@@ -80,16 +80,12 @@ main(void) {
 						player = transfer(player, &cpu);
 						cpu = send_to_bottom(cpu);
 						cpu = send_to_bottom(cpu);
-						print_deck(cpu);
 					}
 					if (cpu->card.num < player->card.num) {
 						cpu = transfer(cpu, &player);
 						player = send_to_bottom(player);
 						player = send_to_bottom(player);
-						print_deck(player);
 					}
-					player = player->next;
-					cpu = cpu->next;
 
 					state = 0;
 				break;
@@ -100,6 +96,10 @@ main(void) {
 
 		if (IsMouseButtonPressed(0)) {
 			update = 1;
+		}
+
+		if (cpu == NULL || player == NULL) {
+			return 1;
 		}
 
 		draw_deck(cpu);
