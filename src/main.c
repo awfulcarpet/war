@@ -261,13 +261,16 @@ main(void) {
 				state = 0;
 				game_set = 0;
 			}
-		} else if (true || IsMouseButtonPressed(0)) {
+		} else if (IsMouseButtonPressed(0)) {
 			update = 1;
 		}
 
-		draw_deck(cpu);
 		draw_deck(player);
+		draw_deck(cpu);
 		DrawText(TextFormat("%d\n", get_length(player)), player_deck.x + 10, player_deck.y + 10, 30, WHITE);
+		DrawText("Player", player_deck.x, player_deck.y - 30, 20, BLACK);
+
+		DrawText("CPU", cpu_deck.x, cpu_deck.y + 105 + 10, 20, BLACK);
 		DrawText(TextFormat("%d\n", get_length(cpu)), cpu_deck.x + 10, cpu_deck.y + 10, 30, WHITE);
 		EndDrawing();
 	}
