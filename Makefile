@@ -4,7 +4,7 @@ LDLIBS = -lraylib -lGL -lm -lX11 -lpthread -ldl -lrt
 EMCCFLAGS = lib/libraylib.a -s USE_GLFW=3 --shell-file minshell.html -s ASYNCIFY
 PLATFORM ?= PLATFORM_DESKTOP
 
-ifeq ($(PLATFORM),PLATFORM_WEB)
+ifeq ($(PLATFORM),WEB)
 	CC=emcc
 	LDLIBS = $(EMCCFLAGS)
 	EXT = .html
@@ -53,8 +53,8 @@ release: $(NAME)
 web-release: clean $(NAME)
 	@rm -rf pub index.html
 	@mkdir -p pub
-	mv -f .build/war.* pub/
-	sed 's/war.js/pub\/war.js/g' pub/war.html > index.html
+	mv -f .build/$(NAME).* pub/
+	mv pub/$(NAME).html pub/index.html
 
 install: $(release)
 	cp .build/$(NAME) $(PREFIX)/$(NAME)
@@ -63,4 +63,4 @@ uninstall:
 	rm $(PREFIX)/$(NAME)
 
 clean:
-	rm -rf .build/ log core
+	rm -rf .build/ log core pub

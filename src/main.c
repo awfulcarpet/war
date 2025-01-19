@@ -50,7 +50,7 @@ Vector2 player_war = {
 
 
 void
-reset()
+reset(void)
 {
 	deck = fill(deck);
 
