@@ -247,7 +247,7 @@ main(void) {
 			else if (player == NULL || player_next == NULL)
 				DrawText("CPU Wins", WIDTH / 2 - MeasureText("CPU Wins", 20) / 2, HEIGHT / 2, 20, BLACK);
 
-			DrawText("Right Click To Continue", WIDTH / 2 - MeasureText("Right Click To Continue", 10) / 2, HEIGHT / 2 + 30, 10, BLACK);
+			DrawText("Right Click To Play Again", WIDTH / 2 - MeasureText("Right Click To Play Again", 10) / 2, HEIGHT / 2 + 30, 10, BLACK);
 
 			if (IsMouseButtonPressed(1)) {
 				free_deck(cpu);
