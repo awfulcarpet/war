@@ -85,7 +85,8 @@ fill(struct Deck *deck) {
 
 struct Deck *
 deal(struct Deck *deck, struct Deck **player1, struct Deck **player2) {
-	for (int i = 0; i < 52; i++) {
+	int len = get_length(deck);
+	for (int i = 0; i < len; i++) {
 		if (i % 2 == 0)
 			deck = transfer(deck, player1);
 		else
@@ -111,8 +112,8 @@ struct Deck *
 shuffle(struct Deck *deck) {
 
 	for (int i = 0; i < 10000; i++) {
-		struct Deck *card1 = get_nth(deck, GetRandomValue(1, 52));
-		struct Deck *card2 = get_nth(deck, GetRandomValue(1, 52));
+		struct Deck *card1 = get_nth(deck, GetRandomValue(1, get_length(deck)));
+		struct Deck *card2 = get_nth(deck, GetRandomValue(1, get_length(deck)));
 
 		struct Card tmp = card1->card;
 
@@ -169,5 +170,17 @@ move_deck(struct Deck *deck, Vector2 new) {
 	do {
 		deck->card.pos = new;
 		deck = deck->next;
+	} while (deck != NULL);
+}
+
+void
+free_deck(struct Deck *deck) {
+	if (deck == NULL)
+		return;
+
+	do {
+		struct Deck *tmp = deck->next;
+		free(deck);
+		deck = tmp;
 	} while (deck != NULL);
 }

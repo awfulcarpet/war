@@ -10,65 +10,79 @@ enum {
 	HEIGHT = 650,
 };
 
+struct Deck *deck = NULL;
+struct Deck *player = NULL;
+struct Deck *cpu = NULL;
+
+struct Deck *cpu_next = NULL;
+struct Deck *player_next = NULL;
+
+Vector2 player_deck = {
+	WIDTH - 80,
+	HEIGHT - 110,
+};
+
+Vector2 cpu_deck = {
+	WIDTH - 80,
+	0,
+};
+
+Vector2 cpu_play = {
+	WIDTH / 2.0 - 75.0 / 2.0,
+	140,
+};
+
+Vector2 player_play = {
+	WIDTH / 2.0 - 75.0 / 2.0,
+	HEIGHT - 140 - 105,
+};
+
+Vector2 cpu_war = {
+	WIDTH / 2.0 - ((75.0 / 2.0 + 5) * 5),
+	10,
+};
+
+Vector2 player_war = {
+	WIDTH / 2.0 - ((75.0 / 2.0 + 5) * 5),
+	HEIGHT - 105 - 10,
+};
+
+
+
+void
+reset()
+{
+	deck = fill(deck);
+
+	assert(get_length(deck) == 52);
+
+	deck = shuffle(deck);
+	deck = deal(deck, &player, &cpu);
+
+	assert(get_length(player) == get_length(cpu));
+	assert(get_length(player) == 26);
+	assert(deck == NULL);
+
+	move_deck(cpu, cpu_deck);
+	move_deck(player, player_deck);
+}
 
 int
 main(void) {
 	InitWindow(WIDTH, HEIGHT, "war card game");
 	SetTargetFPS(30);
 
-	struct Deck *deck = NULL;
-	struct Deck *player = NULL;
-	struct Deck *cpu = NULL;
+	reset();
 
-	struct Deck *cpu_next = NULL;
-	struct Deck *player_next = NULL;
+	cpu->card.num = 5;
+	player->card.num = 5;
 
-	deck = fill(deck);
-	assert(get_length(deck) == 52);
-
-	deck = shuffle(deck);
-
-	deck = deal(deck, &player, &cpu);
-	assert(get_length(player) == get_length(cpu));
-	assert(get_length(player) == 26);
-
-	Vector2 player_deck = {
-		WIDTH - 80,
-		HEIGHT - 110,
-	};
-
-	Vector2 cpu_deck = {
-		WIDTH - 80,
-		0,
-	};
-
-	Vector2 cpu_play = {
-		WIDTH / 2.0 - 75.0 / 2.0,
-		140,
-	};
-
-	Vector2 player_play = {
-		WIDTH / 2.0 - 75.0 / 2.0,
-		HEIGHT - 140 - 105,
-	};
-
-	Vector2 cpu_war = {
-		WIDTH / 2.0 - ((75.0 / 2.0 + 5) * 5),
-		10,
-	};
-
-	Vector2 player_war = {
-		WIDTH / 2.0 - ((75.0 / 2.0 + 5) * 5),
-		HEIGHT - 105 - 10,
-	};
-
-
-	move_deck(cpu, cpu_deck);
-	move_deck(player, player_deck);
+	player->next->card.num = 9;
 
 	int update = 0;
 	int state = 0;
 	int offset = 0;
+	int game_set = 0;
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 		ClearBackground(GREEN);
@@ -138,11 +152,13 @@ main(void) {
 					}
 				break;
 				case 3:
-					if (cpu_next != NULL)
-						cpu_next->card.isfaceup = true;
+					if (cpu_next == NULL || player_next == NULL) {
+						goto end;
+					}
 
-					if (player_next != NULL)
-						player_next->card.isfaceup = true;
+					cpu_next->card.isfaceup = true;
+
+					player_next->card.isfaceup = true;
 
 					if (player_next->card.num != cpu_next->card.num) {
 						state = 4;
@@ -151,6 +167,9 @@ main(void) {
 					state = 2;
 					break;
 				case 4: {
+					if (cpu_next == NULL || player_next == NULL)
+						goto end;
+
 					if (cpu_next->card.num > player_next->card.num) {
 						do {
 							player->card.pos = cpu_deck;
@@ -220,17 +239,30 @@ main(void) {
 		}
 
 
-		/*if (IsMouseButtonPressed(0)) {*/
-			update = 1;
-		/*}*/
+		if (cpu == NULL || player == NULL || game_set) {
+			end:
+			game_set = 1;
+			if (cpu == NULL || cpu_next == NULL)
+				DrawText("Player Wins", WIDTH / 2 - MeasureText("Player Wins", 20) / 2, HEIGHT / 2, 20, BLACK);
+			else if (player == NULL || player_next == NULL)
+				DrawText("CPU Wins", WIDTH / 2 - MeasureText("CPU Wins", 20) / 2, HEIGHT / 2, 20, BLACK);
 
-		end:
-		if (cpu == NULL || player == NULL) {
-			if (cpu == NULL)
-				printf("player wins\n");
-			if (player == NULL)
-				printf("cpu wins\n");
-			return 1;
+			DrawText("Right Click To Continue", WIDTH / 2 - MeasureText("Right Click To Continue", 10) / 2, HEIGHT / 2 + 30, 10, BLACK);
+
+			if (IsMouseButtonPressed(1)) {
+				free_deck(cpu);
+				free_deck(player);
+				free_deck(deck);
+
+				cpu = player = deck = NULL;
+
+				reset();
+
+				state = 0;
+				game_set = 0;
+			}
+		} else if (true || IsMouseButtonPressed(0)) {
+			update = 1;
 		}
 
 		draw_deck(cpu);

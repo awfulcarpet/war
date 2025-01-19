@@ -18,3 +18,4 @@ void update_deck(struct Deck *deck);
 void move_deck(struct Deck *deck, Vector2 new);
 struct Deck * get_nth(struct Deck *deck, int n);
 struct Deck * send_to_bottom(struct Deck *deck);
+void free_deck(struct Deck *deck);
