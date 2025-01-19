@@ -24,7 +24,7 @@ Vector2 player_deck = {
 
 Vector2 cpu_deck = {
 	WIDTH - 80,
-	0,
+	5,
 };
 
 Vector2 cpu_play = {
