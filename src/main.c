@@ -20,6 +20,9 @@ main(void) {
 	struct Deck *player = NULL;
 	struct Deck *cpu = NULL;
 
+	struct Deck *cpu_next = NULL;
+	struct Deck *player_next = NULL;
+
 	deck = fill(deck);
 	assert(get_length(deck) == 52);
 
@@ -28,8 +31,6 @@ main(void) {
 	deck = deal(deck, &player, &cpu);
 	assert(get_length(player) == get_length(cpu));
 	assert(get_length(player) == 26);
-
-	player->card.pos = (Vector2) { 0, 0 };
 
 	Vector2 player_deck = {
 		WIDTH - 80,
@@ -51,11 +52,23 @@ main(void) {
 		HEIGHT - 140 - 105,
 	};
 
+	Vector2 cpu_war = {
+		WIDTH / 2.0 - ((75.0 / 2.0 + 5) * 5),
+		10,
+	};
+
+	Vector2 player_war = {
+		WIDTH / 2.0 - ((75.0 / 2.0 + 5) * 5),
+		HEIGHT - 105 - 10,
+	};
+
+
 	move_deck(cpu, cpu_deck);
 	move_deck(player, player_deck);
 
 	int update = 0;
 	int state = 0;
+	int offset = 0;
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 		ClearBackground(GREEN);
@@ -71,6 +84,11 @@ main(void) {
 					player->card.isfaceup = true;
 				break;
 				case 2:
+					if (cpu->card.num == player->card.num) {
+						offset++;
+						goto war;
+					}
+
 					player->card.pos = player_deck;
 					cpu->card.pos = cpu_deck;
 					player->card.isfaceup = false;
@@ -80,28 +98,138 @@ main(void) {
 						player = transfer(player, &cpu);
 						cpu = send_to_bottom(cpu);
 						cpu = send_to_bottom(cpu);
+						state = 0;
+						break;
 					}
 
 					if (cpu->card.num < player->card.num) {
 						cpu = transfer(cpu, &player);
 						player = send_to_bottom(player);
 						player = send_to_bottom(player);
+						state = 0;
+						break;
+					}
+				break;
+
+				// war
+				war:
+					if (cpu == NULL)
+						break;
+					if (player == NULL)
+						break;
+
+					cpu_next = cpu;
+					player_next = player;
+					int i = 0;
+					for (i = 0; i < offset; i++) {
+						cpu_next = cpu_next->next;
+						player_next = player_next->next;
+
+						if (cpu_next == NULL)
+							break;
+						if (player_next == NULL)
+							break;
+
+						cpu_next->card.pos = cpu_war;
+						cpu_next->card.pos.x += i * 5;
+
+						player_next->card.pos = player_war;
+						player_next->card.pos.x += i * 3;
+					}
+				break;
+				case 3:
+					if (cpu_next != NULL)
+						cpu_next->card.isfaceup = true;
+
+					if (player_next != NULL)
+						player_next->card.isfaceup = true;
+
+					if (player_next->card.num != cpu_next->card.num) {
+						state = 4;
+						break;
+					}
+					state = 2;
+					break;
+				case 4: {
+					if (cpu_next->card.num > player_next->card.num) {
+						do {
+							player->card.pos = cpu_deck;
+							player->card.isfaceup = false;
+							cpu->card.pos = cpu_deck;
+							cpu->card.isfaceup = false;
+							player = transfer(player, &cpu);
+						} while (player != NULL && player != player_next);
+						if (player == NULL)
+							goto end;
+
+						player->card.pos = cpu_deck;
+						player->card.isfaceup = false;
+						player = transfer(player, &cpu);
+
+						do {
+							cpu->card.pos = cpu_deck;
+							cpu->card.isfaceup = false;
+							cpu = send_to_bottom(cpu);
+						} while (cpu != cpu_next);
+						if (cpu == NULL)
+							goto end;
+
+						cpu->card.pos = cpu_deck;
+						cpu->card.isfaceup = false;
+						cpu = send_to_bottom(cpu);
 					}
 
-					// tie
+					if (cpu_next->card.num < player_next->card.num) {
+						do {
+							cpu->card.pos = player_deck;
+							cpu->card.isfaceup = false;
+							player->card.pos = player_deck;
+							player->card.isfaceup = false;
+							cpu = transfer(cpu, &player);
+						} while (cpu != NULL && cpu != cpu_next);
+						if (cpu == NULL)
+							goto end;
 
+						cpu->card.pos = player_deck;
+						cpu->card.isfaceup = false;
+						cpu = transfer(cpu, &player);
+
+						do {
+							player->card.pos = player_deck;
+							player->card.isfaceup = false;
+							player = send_to_bottom(player);
+						} while (player != NULL && player != player_next);
+						if (player == NULL)
+							goto end;
+
+						player->card.pos = player_deck;
+						player->card.isfaceup = false;
+						player = send_to_bottom(player);
+					}
+
+					cpu_next = player_next = NULL;
+					offset = 0;
 					state = 0;
-				break;
+					break;
+				}
+				default:
+					state = 0;
+					break;
 			}
 			update = 0;
 		}
 
 
-		if (IsMouseButtonPressed(0)) {
+		/*if (IsMouseButtonPressed(0)) {*/
 			update = 1;
-		}
+		/*}*/
 
+		end:
 		if (cpu == NULL || player == NULL) {
+			if (cpu == NULL)
+				printf("player wins\n");
+			if (player == NULL)
+				printf("cpu wins\n");
 			return 1;
 		}
 
